@@ -1,0 +1,15 @@
+{
+  "info": {"name":"Intelligent File Deduplication API","schema":"https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},
+  "variable": [{"key":"base_url","value":"http://localhost:8000/api/v1"},{"key":"token","value":""},{"key":"file_id","value":""}],
+  "item": [
+    {"name":"Register","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"email\":\"user@example.com\",\"password\":\"StrongPassword123!\"}"},"url":"{{base_url}}/auth/register"}},
+    {"name":"Login","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"email\":\"user@example.com\",\"password\":\"StrongPassword123!\"}"},"url":"{{base_url}}/auth/login"}},
+    {"name":"List Files","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{base_url}}/files?page=1&page_size=20&sort_by=uploaded_at&sort_order=desc"}},
+    {"name":"Upload File","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"body":{"mode":"formdata","formdata":[{"key":"file","type":"file","src":""}]},"url":"{{base_url}}/files/upload"}},
+    {"name":"Duplicates","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{base_url}}/duplicates"}},
+    {"name":"Dashboard","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{base_url}}/analytics/dashboard"}},
+    {"name":"Deletion Preview","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{base_url}}/deletions/{{file_id}}/preview"}},
+    {"name":"Delete File","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{base_url}}/deletions/{{file_id}}"}},
+    {"name":"Deletion History","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":"{{base_url}}/deletions/history"}}
+  ]
+}

@@ -1,0 +1,71 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: dedup_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: file_deduplication
+      MYSQL_USER: dedup_user
+      MYSQL_PASSWORD: dedup_password
+      MYSQL_ROOT_PASSWORD: root_password_change_me
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -proot_password_change_me --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    container_name: dedup_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD","redis-cli","ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  backend:
+    build: .
+    container_name: dedup_backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: mysql+pymysql://dedup_user:dedup_password@mysql:3306/file_deduplication
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      mysql: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+  worker:
+    build: .
+    container_name: dedup_worker
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: mysql+pymysql://dedup_user:dedup_password@mysql:3306/file_deduplication
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      mysql: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    command: celery -A app.workers.celery_app:celery_app worker --loglevel=INFO
+volumes:
+  mysql_data:
+  redis_data:

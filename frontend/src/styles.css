@@ -1,0 +1,33 @@
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; }
+button, input { font: inherit; }
+
+@keyframes floatOrb {
+  0%,100% { transform: translate3d(0,0,0) scale(1); }
+  50% { transform: translate3d(0,-12px,0) scale(1.03); }
+}
+@keyframes shimmer {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+@keyframes pulseGlow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(124,108,255,.12); }
+  50% { box-shadow: 0 0 0 12px rgba(124,108,255,0); }
+}
+
+.dedup-orb { animation: floatOrb 7s ease-in-out infinite; }
+.dedup-pulse { animation: pulseGlow 2.8s ease-in-out infinite; }
+.dedup-hover { transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.dedup-hover:hover { transform: translateY(-3px); border-color: rgba(124,108,255,.28) !important; box-shadow: 0 24px 70px rgba(0,0,0,.3) !important; }
+
+.glass {
+  background: linear-gradient(145deg, rgba(17,25,47,.78), rgba(8,14,29,.72));
+  border: 1px solid rgba(160,175,220,.10);
+  backdrop-filter: blur(22px);
+}
+
+@media (max-width: 900px) {
+  .desktop-only { display: none !important; }
+}
